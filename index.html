@@ -71,6 +71,31 @@
         #submitBtn:hover {
         background-color: #666;
         }
+        #messageBox {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            display: none;
+            font-weight: bold;
+        }
+
+        /* Erfolg */
+        .success {
+            background-color: #00cc66;
+            color: black;
+        }
+
+        /* Fehler */
+        .error {
+            background-color: #ff4444;
+        }
+
+        /* Warnung */
+        .warning {
+            background-color: #ffcc00;
+            color: black;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -135,6 +160,7 @@
         <label for="a5">5</label>
     </div>
     <button id="submitBtn">Bewertung absenden</button>
+    <div id="messageBox"></div>
     <script>
         const supabaseUrl = "https://jagyzxwkkxkkuqvmokwq.supabase.co";
         const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";
@@ -143,12 +169,13 @@
         const client = createClient(supabaseUrl, supabaseKey);
 
         document.getElementById("submitBtn").addEventListener("click", async () => {
+
             const hygiene = document.querySelector('input[name="hygiene"]:checked');
             const geruch = document.querySelector('input[name="geruch"]:checked');
             const ausstattung = document.querySelector('input[name="ausstattung"]:checked');
 
             if (!hygiene || !geruch || !ausstattung) {
-                alert("Bitte alle Kategorien bewerten!");
+                showMessage("Bitte alle Kategorien bewerten!!!", "warning");
                 return;
             }
 
@@ -160,11 +187,25 @@
 
             if (error) {
                 console.log(error);
-                alert("Fehler beim Speichern");
+                showMessage("Fehler beim Speichern!", "error");
             } else {
-                alert("Danke für deine Bewertung!");
+                showMessage("Danke für deine Bewertung!", "success");
             }
         });
+
+        function showMessage(text, type) {
+            const box = document.getElementById("messageBox");
+
+            box.innerText = text;
+            box.className = "";
+            box.classList.add(type);
+
+            box.style.display = "block";
+
+            setTimeout(() => {
+                box.style.display = "none";
+            }, 2500);
+        }
     </script>
 </body>
 
