@@ -98,25 +98,49 @@
         <input type="radio" id="g5" name="geruch" value="5">
         <label for="g5">5</label>
     </div>
-        <h2>Ausstatung</h2>
+        <h2>Ausstattung</h2>
 
     <div class="rating">
-        <input type="radio" id="a1" name="ausstatung" value="1">
+        <input type="radio" id="a1" name="ausstattung" value="1">
         <label for="a1">1</label>
 
-        <input type="radio" id="a2" name="ausstatung" value="2">
+        <input type="radio" id="a2" name="ausstattung" value="2">
         <label for="a2">2</label>
 
-        <input type="radio" id="a3" name="ausstatung" value="3">
+        <input type="radio" id="a3" name="ausstattung" value="3">
         <label for="a3">3</label>
 
-        <input type="radio" id="a4" name="ausstatung" value="4">
+        <input type="radio" id="a4" name="ausstattung" value="4">
         <label for="a4">4</label>
 
-        <input type="radio" id="a5" name="ausstatung" value="5">
+        <input type="radio" id="a5" name="ausstattung" value="5">
         <label for="a5">5</label>
     </div>
     <button id="submitBtn">Bewertung absenden</button>
+    <script>
+    document.getElementById("submitBtn").addEventListener("click", function() {
+
+        const hygiene =
+            document.querySelector('input[name="hygiene"]:checked');
+
+        const geruch =
+            document.querySelector('input[name="geruch"]:checked');
+
+        const ausstattung =
+            document.querySelector('input[name="ausstattung"]:checked');
+
+        if (!hygiene || !geruch || !ausstattung) {
+            alert("Bitte alle Kategorien bewerten.");
+            return;
+        }
+
+        alert(
+            "Hygiene: " + hygiene.value +
+            "\nGeruch: " + geruch.value +
+            "\nAusstattung: " + ausstattung.value
+        );
+    });
+    </script>
 </body>
 
 </html>
