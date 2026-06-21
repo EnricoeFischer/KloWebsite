@@ -54,7 +54,25 @@
             background-color: #00cc66;
             color: black;
         }
+        #submitBtn {
+        display: block;
+        margin: 30px auto;
+        padding: 12px 20px;
+
+        background-color: #444;
+        color: white;
+
+        border: none;
+        border-radius: 8px;
+
+        font-size: 16px;
+        cursor: pointer;
+        }
+        #submitBtn:hover {
+        background-color: #666;
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -118,28 +136,35 @@
     </div>
     <button id="submitBtn">Bewertung absenden</button>
     <script>
-    document.getElementById("submitBtn").addEventListener("click", function() {
+        const supabaseUrl = "https://jagyzxwkkxkkuqvmokwq.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";
 
-        const hygiene =
-            document.querySelector('input[name="hygiene"]:checked');
+        const { createClient } = supabase;
+        const client = createClient(supabaseUrl, supabaseKey);
 
-        const geruch =
-            document.querySelector('input[name="geruch"]:checked');
+        document.getElementById("submitBtn").addEventListener("click", async () => {
+            const hygiene = document.querySelector('input[name="hygiene"]:checked');
+            const geruch = document.querySelector('input[name="geruch"]:checked');
+            const ausstattung = document.querySelector('input[name="ausstattung"]:checked');
 
-        const ausstattung =
-            document.querySelector('input[name="ausstattung"]:checked');
+            if (!hygiene || !geruch || !ausstattung) {
+                alert("Bitte alle Kategorien bewerten!");
+                return;
+            }
 
-        if (!hygiene || !geruch || !ausstattung) {
-            alert("Bitte alle Kategorien bewerten.");
-            return;
-        }
+            const { error } = await client.from("ratings").insert([{
+                hygiene: Number(hygiene.value),
+                geruch: Number(geruch.value),
+                ausstattung: Number(ausstattung.value)
+            }]);
 
-        alert(
-            "Hygiene: " + hygiene.value +
-            "\nGeruch: " + geruch.value +
-            "\nAusstattung: " + ausstattung.value
-        );
-    });
+            if (error) {
+                console.log(error);
+                alert("Fehler beim Speichern");
+            } else {
+                alert("Danke für deine Bewertung!");
+            }
+        });
     </script>
 </body>
 
