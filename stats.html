@@ -1,22 +1,156 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Dixi Bewertungen</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Dixi Stats</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+        }
+
+        .stat {
+            margin: 40px auto;
+            max-width: 500px;
+        }
+
+        .label {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Farbskala */
+        .bar {
+            position: relative;
+            height: 22px;
+            border-radius: 12px;
+            background: linear-gradient(to right, red, orange, yellow, green);
+        }
+
+        /* Marker */
+        .marker {
+            position: absolute;
+            top: -28px;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+
+        .marker span {
+            background: black;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 12px;
+            border: 1px solid white;
+        }
+
+        /* Skala unten */
+        .scale {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-top: 6px;
+            opacity: 0.7;
+        }
+        .barMarker {
+            position: absolute;
+            top: 0;
+            height: 100%;
+
+            width: 14px;
+
+            transform: translateX(-50%);
+
+            border: 2px solid black;
+            background: transparent;
+
+            border-radius: 4px;
+
+            pointer-events: none;
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>Aktuelle Bewertungen</h1>
+    <h1>Dixi Bewertungen</h1>
 
-<p>Hygiene: <span id="avgHygiene">...</span></p>
-<p>Geruch: <span id="avgGeruch">...</span></p>
-<p>Ausstattung: <span id="avgAusstattung">...</span></p>
-<p>Anzahl Bewertungen: <span id="count">...</span></p>
+    <div class="stat">
+        <div class="label">Hygiene</div>
+        <div class="bar" id="barHygiene">
+
+            <!-- NEU: Marker AUF der Skala -->
+            <div class="barMarker" id="barMarkerHygiene"></div>
+
+            <!-- ALT: Marker mit Zahl bleibt -->
+            <div class="marker" id="markerHygiene">
+                <span id="valHygiene">0.0</span>
+            </div>
+
+        </div>
+        </div>
+        <div class="scale">
+            <span>1</span>
+            <span>5</span>
+        </div>
+    </div>
+
+    <div class="stat">
+        <div class="label">Geruch</div>
+        <div class="bar" id="barGeruch">
+
+            <!-- NEU: Marker AUF der Skala -->
+            <div class="barMarker" id="barMarkerGeruch"></div>
+
+            <!-- ALT: Marker mit Zahl bleibt -->
+            <div class="marker" id="markerGeruch">
+                <span id="valGeruch">0.0</span>
+            </div>
+
+        </div>
+        </div>
+        <div class="scale">
+            <span>1</span>
+            <span>5</span>
+        </div>
+    </div>
+
+    <div class="stat">
+        <div class="label">Ausstattung</div>
+        <div class="bar" id="barAusstattung">
+
+            <!-- NEU: Marker AUF der Skala -->
+            <div class="barMarker" id="barMarkerAusstattung"></div>
+
+            <!-- ALT: Marker mit Zahl bleibt -->
+            <div class="marker" id="markerAusstattung">
+                <span id="valAusstattung">0.0</span>
+            </div>
+
+</div>
+        </div>
+        <div class="scale">
+            <span>1</span>
+            <span>5</span>
+        </div>
+    </div>
 
 <script>
-const supabaseUrl = "https://jagyzxwkkxkkuqvmokwq.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";
+        const supabaseUrl = "https://jagyzxwkkxkkuqvmokwq.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";
 
 
 const { createClient } = supabase;
@@ -26,39 +160,35 @@ loadStats();
 
 async function loadStats() {
 
-        const { data, error } = await client
+    const { data, error } = await client
         .from("rating_stats")
         .select("*")
         .single();
 
-        console.log(data);
-        console.log(error);
+    console.log(data, error);
 
-    if (error) {
+    if (error || !data) {
         console.error(error);
         return;
     }
-        if (!data) {
-            document.getElementById("avgHygiene").textContent = "0.0";
-            document.getElementById("avgGeruch").textContent = "0.0";
-            document.getElementById("avgAusstattung").textContent = "0.0";
-            document.getElementById("count").textContent = "0";
-            return;
-            }
-        document.getElementById("avgHygiene").textContent =
-            data.hygiene_avg.toFixed(1);
 
-        document.getElementById("avgGeruch").textContent =
-            data.geruch_avg.toFixed(1);
-
-        document.getElementById("avgAusstattung").textContent =
-            data.ausstattung_avg.toFixed(1);
-
-        document.getElementById("count").textContent =
-            data.total_ratings;
-
-
+    setBar("markerHygiene", "valHygiene", "barMarkerHygiene", data.hygiene_avg);
+    setBar("markerGeruch", "valGeruch", "barMarkerGeruch", data.geruch_avg);
+    setBar("markerAusstattung", "valAusstattung", "barMarkerAusstattung", data.ausstattung_avg);
 }
+
+function setBar(markerId, valueId, barMarkerId, value) {
+
+    const safeValue = value ?? 3;
+
+    // 1–5 → 0–100%
+    const percent = ((safeValue - 1) / 4) * 100;
+
+    document.getElementById(markerId).style.left = percent + "%";
+    document.getElementById(valueId).textContent = safeValue.toFixed(1);
+    
+    document.getElementById(barMarkerId).style.left = percent + "%";
+}   
 </script>
 
 </body>
