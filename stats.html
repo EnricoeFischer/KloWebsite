@@ -29,6 +29,9 @@ async function loadStats() {
         .from("ratings")
         .select("*");
 
+        console.log(data);
+        console.log(error);
+            
     if (error) {
         console.error(error);
         return;
