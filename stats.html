@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dixi Bewertungen</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<h1>Aktuelle Bewertungen</h1>
+
+<p>Hygiene: <span id="avgHygiene">...</span></p>
+<p>Geruch: <span id="avgGeruch">...</span></p>
+<p>Ausstattung: <span id="avgAusstattung">...</span></p>
+<p>Anzahl Bewertungen: <span id="count">...</span></p>
+
+<script>
+const supabaseUrl = "https://jagyzxwkkxkkuqvmokwq.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";
+
+const { createClient } = supabase;
+const client = createClient(supabaseUrl, supabaseKey);
+
+loadStats();
+
+async function loadStats() {
+
+    const { data, error } = await client
+        .from("ratings")
+        .select("*");
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    const count = data.length;
+
+    const avgHygiene =
+        data.reduce((sum, row) => sum + row.hygiene, 0) / count;
+
+    const avgGeruch =
+        data.reduce((sum, row) => sum + row.geruch, 0) / count;
+
+    const avgAusstattung =
+        data.reduce((sum, row) => sum + row.ausstattung, 0) / count;
+
+    document.getElementById("avgHygiene").textContent =
+        avgHygiene.toFixed(1);
+
+    document.getElementById("avgGeruch").textContent =
+        avgGeruch.toFixed(1);
+
+    document.getElementById("avgAusstattung").textContent =
+        avgAusstattung.toFixed(1);
+
+    document.getElementById("count").textContent =
+        count;
+}
+</script>
+
+</body>
+</html>
