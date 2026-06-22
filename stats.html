@@ -26,9 +26,10 @@ loadStats();
 
 async function loadStats() {
 
-    const { data, error } = await client
-        .from("ratings")
-        .select("*");
+        const { data, error } = await client
+        .from("rating_stats")
+        .select("*")
+        .single();
 
         console.log(data);
         console.log(error);
@@ -38,28 +39,25 @@ async function loadStats() {
         return;
     }
 
-    const count = data.length;
+        document.getElementById("avgHygiene").textContent =
+            data.hygiene_avg.toFixed(1);
 
-    const avgHygiene =
-        data.reduce((sum, row) => sum + row.hygiene, 0) / count;
+        document.getElementById("avgGeruch").textContent =
+            data.geruch_avg.toFixed(1);
 
-    const avgGeruch =
-        data.reduce((sum, row) => sum + row.geruch, 0) / count;
+        document.getElementById("avgAusstattung").textContent =
+            data.ausstattung_avg.toFixed(1);
 
-    const avgAusstattung =
-        data.reduce((sum, row) => sum + row.ausstattung, 0) / count;
-
-    document.getElementById("avgHygiene").textContent =
-        avgHygiene.toFixed(1);
-
-    document.getElementById("avgGeruch").textContent =
-        avgGeruch.toFixed(1);
-
-    document.getElementById("avgAusstattung").textContent =
-        avgAusstattung.toFixed(1);
-
-    document.getElementById("count").textContent =
-        count;
+        document.getElementById("count").textContent =
+            data.total_ratings;
+            
+            if (!data) {
+                document.getElementById("avgHygiene").textContent = "0.0";
+                document.getElementById("avgGeruch").textContent = "0.0";
+                document.getElementById("avgAusstattung").textContent = "0.0";
+                document.getElementById("count").textContent = "0";
+                return;
+                }
 }
 </script>
 
