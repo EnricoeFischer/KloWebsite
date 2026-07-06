@@ -1,3 +1,10 @@
+
+
+
+
+
+
+
 <!DOCTYPE html>
 <html>
 
@@ -6,6 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         body {
@@ -18,68 +26,73 @@
         }
 
         h1 {
-            margin-bottom: 30px;
+            margin-bottom: 3vh;
+            font-size: clamp(22px, 4vw, 34px);
         }
 
         .stat {
-            margin: 40px auto;
-            max-width: 500px;
+            margin: 6vh auto;
+            max-width: 600px;
+            width: 90%;
         }
 
         .label {
-            font-size: 18px;
+            font-size: clamp(16px, 2.2vw, 20px);
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 1rem;
         }
 
-        /* Farbskala */
+        /* Wertanzeige */
+        .valueRow {
+            margin-bottom: 0.6rem;
+        }
+
+        .value {
+            font-size: clamp(14px, 2vw, 18px);
+            padding: 0.25em 0.7em;
+            border: 1px solid white;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        /* Balken */
         .bar {
             position: relative;
-            height: 22px;
-            border-radius: 12px;
+            height: 1.2rem;
+            border-radius: 999px;
             background: linear-gradient(to right, red, orange, yellow, green);
         }
 
-        /* Marker */
-        .marker {
+        /* Marker im Balken */
+        .barMarker {
             position: absolute;
-            top: -28px;
+            top: 0;
+            bottom: 0;
+            width: 0.8rem;
             transform: translateX(-50%);
-            text-align: center;
+            border: 2px solid black;
+            border-radius: 4px;
+            background: transparent;
         }
 
-        .marker span {
-            background: black;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 6px;
-            font-size: 12px;
-            border: 1px solid white;
-        }
-
-        /* Skala unten */
         .scale {
             display: flex;
             justify-content: space-between;
             font-size: 12px;
-            margin-top: 6px;
+            margin-top: 0.4rem;
             opacity: 0.7;
         }
-        .barMarker {
-            position: absolute;
-            top: 0;
-            height: 100%;
+        .chartContainer {
+            display: none;
+            margin-top: 20px;
+        }
 
-            width: 14px;
+        .chartContainer.open {
+            display: block;
+        }
 
-            transform: translateX(-50%);
-
-            border: 2px solid black;
-            background: transparent;
-
-            border-radius: 4px;
-
-            pointer-events: none;
+        .label {
+            cursor: pointer;
         }
     </style>
 </head>
@@ -88,60 +101,60 @@
 
     <h1>Dixi Bewertungen</h1>
 
+    <!-- Hygiene -->
     <div class="stat">
-        <div class="label">Hygiene</div>
-        <div class="bar" id="barHygiene">
+        <div class="label" onclick="toggleChart('hygieneChart')">
+        Hygiene
+    </div>
 
-            <!-- NEU: Marker AUF der Skala -->
+    <div class="chartContainer" id="hygieneChart">
+        <canvas id="canvasHygiene"></canvas>
+    </div>
+
+        <div class="valueRow">
+            <span class="value" id="valHygiene">0.0</span>
+        </div>
+
+        <div class="bar">
             <div class="barMarker" id="barMarkerHygiene"></div>
-
-            <!-- ALT: Marker mit Zahl bleibt -->
-            <div class="marker" id="markerHygiene">
-                <span id="valHygiene">0.0</span>
-            </div>
-
         </div>
-        </div>
+
         <div class="scale">
             <span>1</span>
             <span>5</span>
         </div>
     </div>
 
+    <!-- Geruch -->
     <div class="stat">
         <div class="label">Geruch</div>
-        <div class="bar" id="barGeruch">
 
-            <!-- NEU: Marker AUF der Skala -->
+        <div class="valueRow">
+            <span class="value" id="valGeruch">0.0</span>
+        </div>
+
+        <div class="bar">
             <div class="barMarker" id="barMarkerGeruch"></div>
-
-            <!-- ALT: Marker mit Zahl bleibt -->
-            <div class="marker" id="markerGeruch">
-                <span id="valGeruch">0.0</span>
-            </div>
-
         </div>
-        </div>
+
         <div class="scale">
             <span>1</span>
             <span>5</span>
         </div>
     </div>
 
+    <!-- Ausstattung -->
     <div class="stat">
         <div class="label">Ausstattung</div>
-        <div class="bar" id="barAusstattung">
 
-            <!-- NEU: Marker AUF der Skala -->
-            <div class="barMarker" id="barMarkerAusstattung"></div>
-
-            <!-- ALT: Marker mit Zahl bleibt -->
-            <div class="marker" id="markerAusstattung">
-                <span id="valAusstattung">0.0</span>
-            </div>
-
-</div>
+        <div class="valueRow">
+            <span class="value" id="valAusstattung">0.0</span>
         </div>
+
+        <div class="bar">
+            <div class="barMarker" id="barMarkerAusstattung"></div>
+        </div>
+
         <div class="scale">
             <span>1</span>
             <span>5</span>
@@ -153,42 +166,38 @@
         const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";
 
 
-const { createClient } = supabase;
-const client = createClient(supabaseUrl, supabaseKey);
+    const { createClient } = supabase;
+    const client = createClient(supabaseUrl, supabaseKey);
 
-loadStats();
+    loadStats();
 
-async function loadStats() {
+    async function loadStats() {
+        const { data, error } = await client
+            .from("rating_stats")
+            .select("*")
+            .single();
 
-    const { data, error } = await client
-        .from("rating_stats")
-        .select("*")
-        .single();
+        console.log(data, error);
 
-    console.log(data, error);
+        if (error || !data) return;
 
-    if (error || !data) {
-        console.error(error);
-        return;
+        setBar("valHygiene", "barMarkerHygiene", data.hygiene_avg);
+        setBar("valGeruch", "barMarkerGeruch", data.geruch_avg);
+        setBar("valAusstattung", "barMarkerAusstattung", data.ausstattung_avg);
     }
 
-    setBar("markerHygiene", "valHygiene", "barMarkerHygiene", data.hygiene_avg);
-    setBar("markerGeruch", "valGeruch", "barMarkerGeruch", data.geruch_avg);
-    setBar("markerAusstattung", "valAusstattung", "barMarkerAusstattung", data.ausstattung_avg);
-}
+    function setBar(valueId, barMarkerId, value) {
+        const safeValue = value ?? 3;
 
-function setBar(markerId, valueId, barMarkerId, value) {
+        // 1–5 → 0–100%
+        const percent = ((safeValue - 1) / 4) * 100;
 
-    const safeValue = value ?? 3;
-
-    // 1–5 → 0–100%
-    const percent = ((safeValue - 1) / 4) * 100;
-
-    document.getElementById(markerId).style.left = percent + "%";
-    document.getElementById(valueId).textContent = safeValue.toFixed(1);
-    
-    document.getElementById(barMarkerId).style.left = percent + "%";
-}   
+        document.getElementById(valueId).textContent = safeValue.toFixed(1);
+        document.getElementById(barMarkerId).style.left = percent + "%";
+    }
+    function toggleChart(id) {
+        document.getElementById(id).classList.toggle("open");
+        }
 </script>
 
 </body>
