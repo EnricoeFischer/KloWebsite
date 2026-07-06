@@ -1,10 +1,3 @@
-
-
-
-
-
-
-
 <!DOCTYPE html>
 <html>
 
@@ -40,9 +33,9 @@
             font-size: clamp(16px, 2.2vw, 20px);
             font-weight: bold;
             margin-bottom: 1rem;
+            cursor: pointer;
         }
 
-        /* Wertanzeige */
         .valueRow {
             margin-bottom: 0.6rem;
         }
@@ -55,7 +48,6 @@
             display: inline-block;
         }
 
-        /* Balken */
         .bar {
             position: relative;
             height: 1.2rem;
@@ -63,7 +55,6 @@
             background: linear-gradient(to right, red, orange, yellow, green);
         }
 
-        /* Marker im Balken */
         .barMarker {
             position: absolute;
             top: 0;
@@ -82,17 +73,15 @@
             margin-top: 0.4rem;
             opacity: 0.7;
         }
+
         .chartContainer {
             display: none;
-            margin-top: 20px;
+            margin-top: 15px;
+            height: 250px;
         }
 
         .chartContainer.open {
             display: block;
-        }
-
-        .label {
-            cursor: pointer;
         }
     </style>
 </head>
@@ -101,15 +90,13 @@
 
     <h1>Dixi Bewertungen</h1>
 
-    <!-- Hygiene -->
+    <!-- HYGIENE -->
     <div class="stat">
-        <div class="label" onclick="toggleChart('hygieneChart')">
-        Hygiene
-    </div>
+        <div class="label" onclick="toggleChart('hygieneChart')">Hygiene</div>
 
-    <div class="chartContainer" id="hygieneChart">
-        <canvas id="canvasHygiene"></canvas>
-    </div>
+        <div class="chartContainer" id="hygieneChart">
+            <canvas id="canvasHygiene"></canvas>
+        </div>
 
         <div class="valueRow">
             <span class="value" id="valHygiene">0.0</span>
@@ -125,9 +112,13 @@
         </div>
     </div>
 
-    <!-- Geruch -->
+    <!-- GERUCH -->
     <div class="stat">
-        <div class="label">Geruch</div>
+        <div class="label" onclick="toggleChart('geruchChart')">Geruch</div>
+
+        <div class="chartContainer" id="geruchChart">
+            <canvas id="canvasGeruch"></canvas>
+        </div>
 
         <div class="valueRow">
             <span class="value" id="valGeruch">0.0</span>
@@ -143,9 +134,13 @@
         </div>
     </div>
 
-    <!-- Ausstattung -->
+    <!-- AUSSTATTUNG -->
     <div class="stat">
-        <div class="label">Ausstattung</div>
+        <div class="label" onclick="toggleChart('ausstattungChart')">Ausstattung</div>
+
+        <div class="chartContainer" id="ausstattungChart">
+            <canvas id="canvasAusstattung"></canvas>
+        </div>
 
         <div class="valueRow">
             <span class="value" id="valAusstattung">0.0</span>
@@ -162,6 +157,7 @@
     </div>
 
 <script>
+    // 🔴 HIER EINTRAGEN
         const supabaseUrl = "https://jagyzxwkkxkkuqvmokwq.supabase.co";
         const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";
 
@@ -170,14 +166,13 @@
     const client = createClient(supabaseUrl, supabaseKey);
 
     loadStats();
+    loadHistogram();
 
     async function loadStats() {
         const { data, error } = await client
             .from("rating_stats")
             .select("*")
             .single();
-
-        console.log(data, error);
 
         if (error || !data) return;
 
@@ -186,18 +181,123 @@
         setBar("valAusstattung", "barMarkerAusstattung", data.ausstattung_avg);
     }
 
+    async function loadHistogram() {
+        const { data, error } = await client
+            .from("rating_histogram")
+            .select("*");
+
+        if (error) {
+            console.error(error);
+            return;
+        }
+
+        drawCharts(data);
+    }
+
+    function drawCharts(data) {
+
+        drawChart("canvasHygiene", data, "hygiene");
+        drawChart("canvasGeruch", data, "geruch");
+        drawChart("canvasAusstattung", data, "ausstattung");
+    }
+
+    function drawChart(canvasId, data, category) {
+
+        const filtered = data
+            .filter(x => x.category === category)
+            .sort((a, b) => a.rating - b.rating);
+
+        new Chart(document.getElementById(canvasId), {
+
+            type: "bar",
+
+            data: {
+                labels: filtered.map(x => x.rating),
+                datasets: [{
+                    label: "Anzahl Bewertungen",
+                    data: filtered.map(x => x.amount),
+
+                    backgroundColor: "rgba(0, 200, 255, 0.6)",
+                    borderColor: "rgba(0, 200, 255, 1)",
+                    borderWidth: 1,
+
+                    borderRadius: 6
+                }]
+            },
+
+            options: {
+
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: "white"
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: "rgba(0,0,0,0.8)",
+                        titleColor: "white",
+                        bodyColor: "white"
+                    }
+                },
+
+                scales: {
+
+                    x: {
+                        title: {
+                            display: true,
+                            text: "Bewertung (1 = schlecht, 5 = gut)",
+                            color: "white",
+                            font: {
+                                size: 12
+                            }
+                        },
+                        ticks: {
+                            color: "white"
+                        },
+                        grid: {
+                            color: "rgba(255,255,255,0.1)"
+                        }
+                    },
+
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: "Anzahl",
+                            color: "white",
+                            font: {
+                                size: 12
+                            }
+                        },
+                        ticks: {
+                            color: "white",
+                            precision: 0
+                        },
+                        grid: {
+                            color: "rgba(255,255,255,0.1)"
+                        }
+                    }
+                }
+            }
+        });
+    }
     function setBar(valueId, barMarkerId, value) {
         const safeValue = value ?? 3;
-
-        // 1–5 → 0–100%
         const percent = ((safeValue - 1) / 4) * 100;
 
         document.getElementById(valueId).textContent = safeValue.toFixed(1);
         document.getElementById(barMarkerId).style.left = percent + "%";
     }
+
     function toggleChart(id) {
         document.getElementById(id).classList.toggle("open");
-        }
+
+        // Chart resize fix
+        setTimeout(() => window.dispatchEvent(new Event("resize")), 150);
+    }
 </script>
 
 </body>
