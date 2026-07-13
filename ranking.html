@@ -97,6 +97,31 @@
             cursor: pointer;
 
         }
+
+        .chart-container {
+
+            width: 95%;
+
+            max-width: 900px;
+
+            height: 400px;
+
+            margin: 20px auto;
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .chart-container {
+
+                height: 300px;
+
+                width: 100%;
+
+            }
+
+        }
     </style>
 </head>
 
@@ -152,7 +177,7 @@
     </div>
     <h1>Bewertungen über Zeit</h1>
     <h3>Durchschnitt aller Bewertungen(Gesamtbewertung)</h3>
-    <div style="max-width: 900px; margin: 0 auto;">
+    <div class="chart-container">
         <canvas id="historyChart"></canvas>
     </div>
 
@@ -383,6 +408,7 @@ ${Number(row.overall_avg).toFixed(1)}
                         },
                         options: {
                             responsive: true,
+                            maintainAspectRatio: false,
                             interaction: {
                                 mode: "nearest",
                                 intersect: false
