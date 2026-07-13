@@ -22,11 +22,9 @@ body {
 
 
 .table-container {
-
     width: 100%;
-    overflow-x: auto;
-    margin: auto;
-
+    display: flex;
+    justify-content: center;
 }
 
 
@@ -34,38 +32,64 @@ table {
 
     width: 95%;
     max-width: 900px;
-    min-width: 500px;
-
-    margin: auto;
 
     border-collapse: collapse;
 
-    background: #222;
+    background-color: #222;
+
+    table-layout: fixed;
 
 }
+
 
 
 th {
 
-    background: #cccc00;
+    background-color: #cccc00;
+
     color: black;
 
-    padding: clamp(8px, 2vw, 14px);
+    padding: 8px;
 
-    font-size: clamp(14px, 2vw, 18px);
+    font-size: clamp(12px, 3vw, 18px);
 
     cursor: pointer;
+
+    word-wrap: break-word;
 
 }
 
 
+
 td {
 
-    padding: clamp(8px, 2vw, 12px);
+    padding: 8px;
 
     border: 1px solid white;
 
-    font-size: clamp(13px, 2vw, 17px);
+    font-size: clamp(12px, 3vw, 16px);
+
+    word-wrap: break-word;
+
+}
+
+
+
+@media (max-width: 600px) {
+
+
+    th, td {
+
+        padding: 6px 3px;
+
+    }
+
+
+    table {
+
+        width: 100%;
+
+    }
 
 }
 
