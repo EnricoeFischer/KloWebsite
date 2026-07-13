@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 
@@ -106,9 +107,22 @@
 </head>
 
 <body>
-
+    
     <h1>Rate your Dixi</h1>
+    <h2>Dixi auswählen (nur Test)</h2>
 
+    <select id="dixiSelect">
+        <option value="1">Dixi 1</option>
+        <option value="2">Dixi 2</option>
+        <option value="3">Dixi 3</option>
+        <option value="4">Dixi 4</option>
+        <option value="5">Dixi 5</option>
+        <option value="6">Dixi 6</option>
+        <option value="7">Dixi 7</option>
+        <option value="8">Dixi 8</option>
+        <option value="9">Dixi 9</option>
+        <option value="10">Dixi 10</option>
+    </select>
     <img src="Bilder/5dixies.jpg" alt="Dixies">
     <h2>Hygiene</h2>
 
@@ -168,12 +182,32 @@
     <button id="submitBtn">Bewertung absenden</button>
     <div id="messageBox"></div>
     <script>
-        const supabaseUrl = "https://jagyzxwkkxkkuqvmokwq.supabase.co";
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";
+    const supabaseUrl = "https://jagyzxwkkxkkuqvmokwq.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";
 
-        const { createClient } = supabase;
-        const client = createClient(supabaseUrl, supabaseKey);
+    const params = new URLSearchParams(window.location.search);
+    let dixiId = params.get("dixi");
+    const { createClient } = supabase;
+    const client = createClient(
+        supabaseUrl,
+        supabaseKey
+    );
+    // Falls kein QR-Code:
+    // Dropdown benutzen
+    const dixiSelect = document.getElementById("dixiSelect");
+    if (!dixiId) {
+        dixiId = dixiSelect.value;
+    }
+    // Dropdown aktualisiert Dixi
+    dixiSelect.addEventListener(
+        "change",
+        function(){
 
+            dixiId = this.value;
+
+        }
+    );
+            
         document.getElementById("submitBtn").addEventListener("click", async () => {
 
             const hygiene = document.querySelector('input[name="hygiene"]:checked');
@@ -186,6 +220,7 @@
             }
 
             const { error } = await client.from("ratings").insert([{
+                dixi_id: Number(dixiId),
                 hygiene: Number(hygiene.value),
                 geruch: Number(geruch.value),
                 ausstattung: Number(ausstattung.value)
