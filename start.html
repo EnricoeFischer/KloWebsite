@@ -3,76 +3,73 @@
 
 <head>
 
-<title>Rate your Dixi</title>
+    <title>Rate your Dixi</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-<style>
-
-body {
-
-    background:black;
-    color:white;
-
-    font-family:Arial,sans-serif;
-
-    text-align:center;
-
-    padding:40px;
-
-}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
-h1 {
+    <style>
+        body {
 
-    margin-top:50px;
+            background: black;
+            color: white;
 
-}
+            font-family: Arial, sans-serif;
 
+            text-align: center;
 
-button {
+            padding: 40px;
 
-    display:block;
-
-    width:80%;
-
-    max-width:300px;
-
-    margin:30px auto;
-
-    padding:15px;
-
-    font-size:18px;
-
-    border:none;
-
-    border-radius:10px;
-
-    cursor:pointer;
-
-}
+        }
 
 
-#rateBtn {
+        h1 {
 
-    background:#00cc66;
+            margin-top: 50px;
 
-    color:black;
-
-}
+        }
 
 
-#infoBtn {
+        button {
 
-    background:#cccc00;
+            display: block;
 
-    color:black;
+            width: 80%;
 
-}
+            max-width: 300px;
+
+            margin: 30px auto;
+
+            padding: 15px;
+
+            font-size: 18px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            cursor: pointer;
+
+        }
 
 
-</style>
+        #rateBtn {
+
+            background: #00cc66;
+
+            color: black;
+
+        }
+
+
+        #infoBtn {
+
+            background: #cccc00;
+
+            color: black;
+
+        }
+    </style>
 
 
 </head>
@@ -81,80 +78,80 @@ button {
 <body>
 
 
-<h1>Rate your Dixi</h1>
+    <h1>Rate your Dixi</h1>
 
-<h2>Was möchtest du machen?</h2>
-
-
-
-<button id="rateBtn">
-    Dixi bewerten
-</button>
-
-
-<button id="infoBtn">
-    Dixi Ranking ansehen
-</button>
+    <h2>Was möchtest du machen?</h2>
 
 
 
-<script>
+    <button id="rateBtn">
+        Dixi bewerten
+    </button>
 
 
-const params =
-new URLSearchParams(
-    window.location.search
-);
-
-
-const dixiId =
-params.get("dixi");
+    <button id="infoBtn">
+        Dixi Ranking ansehen
+    </button>
 
 
 
-document
-.getElementById("rateBtn")
-.addEventListener(
-"click",
-function(){
+    <script>
 
 
-    if(dixiId){
-
-        window.location.href =
-        "index.html?dixi=" + dixiId;
-
-    }
-
-    else {
-
-        window.location.href =
-        "index.html";
-
-    }
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
 
 
-});
+        const dixiId =
+            params.get("dixi");
 
 
 
+        document
+            .getElementById("rateBtn")
+            .addEventListener(
+                "click",
+                function () {
 
 
-document
-.getElementById("infoBtn")
-.addEventListener(
-"click",
-function(){
+                    if (dixiId) {
+
+                        window.location.href =
+                            "index.html?dixi=" + dixiId;
+
+                    }
+
+                    else {
+
+                        window.location.href =
+                            "index.html";
+
+                    }
 
 
-    window.location.href =
-    "ranking.html";
+                });
 
 
-});
 
 
-</script>
+
+        document
+            .getElementById("infoBtn")
+            .addEventListener(
+                "click",
+                function () {
+
+
+                    window.location.href =
+                        "ranking.html";
+
+
+                });
+
+
+    </script>
 
 
 </body>

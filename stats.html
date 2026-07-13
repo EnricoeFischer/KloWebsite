@@ -83,6 +83,20 @@
         .chartContainer.open {
             display: block;
         }
+
+        button {
+
+            padding: 10px 20px;
+            margin: 10px;
+
+            border-radius: 8px;
+            border: none;
+
+            font-size: 16px;
+
+            cursor: pointer;
+
+        }
     </style>
 </head>
 
@@ -156,360 +170,361 @@
         </div>
     </div>
     <button id="rankingBtn">
-    Alle Dixies vergleichen
-</button>
+        Alle Dixies vergleichen
+    </button>
     <script>
         document.getElementById("rankingBtn").addEventListener("click", () => {
             window.location.href = "ranking.html";
         });
     </script>
-<script>
-    // 🔴 HIER EINTRAGEN
-    const supabaseUrl = "https://jagyzxwkkxkkuqvmokwq.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";
+    <script>
+        // 🔴 HIER EINTRAGEN
+        const supabaseUrl = "https://jagyzxwkkxkkuqvmokwq.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";
 
-const { createClient } = supabase;
+        const { createClient } = supabase;
 
-const client = createClient(
-    supabaseUrl,
-    supabaseKey
-);
-
-
-// ===============================
-// Dixi ID aus URL lesen
-// Beispiel:
-// stats.html?dixi=5
-// ===============================
-
-const params = new URLSearchParams(
-    window.location.search
-);
-
-const dixiId = Number(
-    params.get("dixi")
-) || 1;
-
-
-// ===============================
-// Start
-// ===============================
-
-loadStats();
-
-loadHistogram();
-
-
-// ===============================
-// Durchschnittswerte laden
-// ===============================
-
-async function loadStats() {
-
-
-    const { data, error } = await client
-        .from("rating_stats_by_dixi")
-        .select("*")
-        .eq("id", dixiId)
-        .single();
-
-
-
-    console.log(
-        "Stats:",
-        data,
-        error
-    );
-
-
-    if(error || !data){
-
-        console.error(error);
-
-        return;
-    }
-
-
-
-    document.getElementById(
-        "dixiTitle"
-    ).innerText =
-        data.name + " Bewertungen";
-
-
-
-    setBar(
-        "valHygiene",
-        "barMarkerHygiene",
-        data.hygiene_avg
-    );
-
-
-    setBar(
-        "valGeruch",
-        "barMarkerGeruch",
-        data.geruch_avg
-    );
-
-
-    setBar(
-        "valAusstattung",
-        "barMarkerAusstattung",
-        data.ausstattung_avg
-    );
-
-}
-
-
-
-// ===============================
-// Histogramm laden
-// ===============================
-
-async function loadHistogram(){
-
-
-    const { data, error } = await client
-        .from("rating_histogram_by_dixi")
-        .select("*")
-        .eq(
-            "dixi_id",
-            dixiId
+        const client = createClient(
+            supabaseUrl,
+            supabaseKey
         );
 
 
+        // ===============================
+        // Dixi ID aus URL lesen
+        // Beispiel:
+        // stats.html?dixi=5
+        // ===============================
 
-    console.log(
-        "Histogram:",
-        data,
-        error
-    );
-
-
-
-    if(error){
-
-        console.error(error);
-
-        return;
-    }
-
-
-
-    drawCharts(data);
-
-}
-
-
-
-// ===============================
-// Charts erzeugen
-// ===============================
-
-function drawCharts(data){
-
-
-    drawChart(
-        "canvasHygiene",
-        data,
-        "hygiene"
-    );
-
-
-    drawChart(
-        "canvasGeruch",
-        data,
-        "geruch"
-    );
-
-
-    drawChart(
-        "canvasAusstattung",
-        data,
-        "ausstattung"
-    );
-}
-
-function drawChart(
-    canvasId,
-    data,
-    category
-){
-    const filtered = data
-        .filter(
-            x =>
-            x.category === category
-        )
-        .sort(
-            (a,b)=>
-            a.rating-b.rating
+        const params = new URLSearchParams(
+            window.location.search
         );
 
-    new Chart(
-        document.getElementById(canvasId),
-        {
-        type:"bar",
-        data:{
-            labels:
-            filtered.map(
-                x=>x.rating
-            ),
-            datasets:[{
-                label:
-                "Anzahl Bewertungen",
-                data:
-                filtered.map(
-                    x=>x.amount
-                ),
-                backgroundColor:
-                "rgba(0,200,255,0.6)",
-                borderColor:
-                "rgba(0,200,255,1)",
-                borderWidth:1,
-                borderRadius:6
-            }]
-        },
-        options:{
-            responsive:true,
-            maintainAspectRatio:false,
-            plugins:{
-                legend:{
-                    labels:{
-                        color:"white"
-                    }
-                }
-            },
-            scales:{
-                x:{
-                    ticks:{
+        const dixiId = Number(
+            params.get("dixi")
+        ) || 1;
 
 
-                        color:"white"
+        // ===============================
+        // Start
+        // ===============================
 
-                    },
+        loadStats();
 
-
-                    title:{
-
-
-                        display:true,
+        loadHistogram();
 
 
-                        text:
-                        "Bewertung (1 = schlecht, 5 = gut)",
-                        color:"white"
-                    },
-                    grid:{
-                        color:
-                        "rgba(255,255,255,0.1)"
-                    }
-                },
-                y:{
-                    beginAtZero:true,
-                    ticks:{
-                        color:"white",
-                        precision:0
-                    },
-                    title:{
-                        display:true,
-                        text:
-                        "Anzahl",
+        // ===============================
+        // Durchschnittswerte laden
+        // ===============================
+
+        async function loadStats() {
 
 
-                        color:"white"
-
-
-                    },
+            const { data, error } = await client
+                .from("rating_stats_by_dixi")
+                .select("*")
+                .eq("id", dixiId)
+                .single();
 
 
 
-                    grid:{
+            console.log(
+                "Stats:",
+                data,
+                error
+            );
 
 
-                        color:
-                        "rgba(255,255,255,0.1)"
+            if (error || !data) {
 
+                console.error(error);
 
-                    }
-
-
-                }
-
-
+                return;
             }
 
 
+
+            document.getElementById(
+                "dixiTitle"
+            ).innerText =
+                data.name + " Bewertungen";
+
+
+
+            setBar(
+                "valHygiene",
+                "barMarkerHygiene",
+                data.hygiene_avg
+            );
+
+
+            setBar(
+                "valGeruch",
+                "barMarkerGeruch",
+                data.geruch_avg
+            );
+
+
+            setBar(
+                "valAusstattung",
+                "barMarkerAusstattung",
+                data.ausstattung_avg
+            );
+
         }
 
-    });
-
-}
 
 
+        // ===============================
+        // Histogramm laden
+        // ===============================
+
+        async function loadHistogram() {
 
 
-// ===============================
-// Bewertungsbalken
-// ===============================
-
-function setBar(
-    valueId,
-    markerId,
-    value
-){
-
-
-    const safeValue =
-        value ?? 3;
+            const { data, error } = await client
+                .from("rating_histogram_by_dixi")
+                .select("*")
+                .eq(
+                    "dixi_id",
+                    dixiId
+                );
 
 
 
-    const percent =
-        ((safeValue - 1) / 4) * 100;
+            console.log(
+                "Histogram:",
+                data,
+                error
+            );
 
 
 
-    document
-    .getElementById(valueId)
-    .innerText =
-    safeValue.toFixed(1);
+            if (error) {
+
+                console.error(error);
+
+                return;
+            }
 
 
 
-    document
-    .getElementById(markerId)
-    .style.left =
-    percent + "%";
+            drawCharts(data);
 
-}
+        }
 
 
 
-// ===============================
-// Diagramm öffnen/schließen
-// ===============================
+        // ===============================
+        // Charts erzeugen
+        // ===============================
 
-function toggleChart(id){
-
-
-    document
-    .getElementById(id)
-    .classList
-    .toggle("open");
+        function drawCharts(data) {
 
 
+            drawChart(
+                "canvasHygiene",
+                data,
+                "hygiene"
+            );
 
-    setTimeout(
-        () =>
-        window.dispatchEvent(
-            new Event("resize")
-        ),
-        150
-    );
 
-}
-    
-</script>
+            drawChart(
+                "canvasGeruch",
+                data,
+                "geruch"
+            );
+
+
+            drawChart(
+                "canvasAusstattung",
+                data,
+                "ausstattung"
+            );
+        }
+
+        function drawChart(
+            canvasId,
+            data,
+            category
+        ) {
+            const filtered = data
+                .filter(
+                    x =>
+                        x.category === category
+                )
+                .sort(
+                    (a, b) =>
+                        a.rating - b.rating
+                );
+
+            new Chart(
+                document.getElementById(canvasId),
+                {
+                    type: "bar",
+                    data: {
+                        labels:
+                            filtered.map(
+                                x => x.rating
+                            ),
+                        datasets: [{
+                            label:
+                                "Anzahl Bewertungen",
+                            data:
+                                filtered.map(
+                                    x => x.amount
+                                ),
+                            backgroundColor:
+                                "rgba(0,200,255,0.6)",
+                            borderColor:
+                                "rgba(0,200,255,1)",
+                            borderWidth: 1,
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: "white"
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: {
+
+
+                                    color: "white"
+
+                                },
+
+
+                                title: {
+
+
+                                    display: true,
+
+
+                                    text:
+                                        "Bewertung (1 = schlecht, 5 = gut)",
+                                    color: "white"
+                                },
+                                grid: {
+                                    color:
+                                        "rgba(255,255,255,0.1)"
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    color: "white",
+                                    precision: 0
+                                },
+                                title: {
+                                    display: true,
+                                    text:
+                                        "Anzahl",
+
+
+                                    color: "white"
+
+
+                                },
+
+
+
+                                grid: {
+
+
+                                    color:
+                                        "rgba(255,255,255,0.1)"
+
+
+                                }
+
+
+                            }
+
+
+                        }
+
+
+                    }
+
+                });
+
+        }
+
+
+
+
+        // ===============================
+        // Bewertungsbalken
+        // ===============================
+
+        function setBar(
+            valueId,
+            markerId,
+            value
+        ) {
+
+
+            const safeValue =
+                value ?? 3;
+
+
+
+            const percent =
+                ((safeValue - 1) / 4) * 100;
+
+
+
+            document
+                .getElementById(valueId)
+                .innerText =
+                safeValue.toFixed(1);
+
+
+
+            document
+                .getElementById(markerId)
+                .style.left =
+                percent + "%";
+
+        }
+
+
+
+        // ===============================
+        // Diagramm öffnen/schließen
+        // ===============================
+
+        function toggleChart(id) {
+
+
+            document
+                .getElementById(id)
+                .classList
+                .toggle("open");
+
+
+
+            setTimeout(
+                () =>
+                    window.dispatchEvent(
+                        new Event("resize")
+                    ),
+                150
+            );
+
+        }
+
+    </script>
 
 </body>
+
 </html>

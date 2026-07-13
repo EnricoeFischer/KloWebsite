@@ -36,7 +36,7 @@
             cursor: pointer;
         }
 
-        .rating input:checked + label {
+        .rating input:checked+label {
             background-color: #00cc66;
             color: black;
         }
@@ -83,7 +83,6 @@
             background-color: #ffcc00;
             color: black;
         }
-
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -205,256 +204,256 @@
 
 
 
-<script>
+    <script>
 
 
-const supabaseUrl =
-"https://jagyzxwkkxkkuqvmokwq.supabase.co";
+        const supabaseUrl =
+            "https://jagyzxwkkxkkuqvmokwq.supabase.co";
 
 
-const supabaseKey ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";;
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";;
 
 
-const { createClient } = supabase;
+        const { createClient } = supabase;
 
 
-const client = createClient(
-    supabaseUrl,
-    supabaseKey
-);
-
-
-
-const params =
-new URLSearchParams(
-    window.location.search
-);
+        const client = createClient(
+            supabaseUrl,
+            supabaseKey
+        );
 
 
 
-let dixiId =
-params.get("dixi");
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
 
 
 
-const dixiSelect =
-document.getElementById("dixiSelect");
-
-
-const testSelector =
-document.getElementById("testSelector");
-
-
-const dixiTitle =
-document.getElementById("dixiTitle");
+        let dixiId =
+            params.get("dixi");
 
 
 
-
-// Entwickler-Testmodus
-
-if (params.get("test") === "true") {
-
-    testSelector.style.display = "block";
-
-    dixiId = dixiSelect.value;
-
-}
+        const dixiSelect =
+            document.getElementById("dixiSelect");
 
 
+        const testSelector =
+            document.getElementById("testSelector");
 
-// QR-Code Modus
 
-else {
-
-    if (!dixiId) {
-
-        dixiId = 1;
-
-    }
-
-}
+        const dixiTitle =
+            document.getElementById("dixiTitle");
 
 
 
-// Sicherheit
 
-if (dixiId < 1 || dixiId > 10) {
+        // Entwickler-Testmodus
 
-    dixiId = 1;
+        if (params.get("test") === "true") {
 
-}
+            testSelector.style.display = "block";
 
+            dixiId = dixiSelect.value;
 
-
-// Anzeige
-
-dixiTitle.innerText =
-"Dixi " + dixiId;
+        }
 
 
 
-// Testmodus Dropdown
+        // QR-Code Modus
 
-dixiSelect.addEventListener(
-    "change",
-    function(){
+        else {
 
-        dixiId = this.value;
+            if (!dixiId) {
+
+                dixiId = 1;
+
+            }
+
+        }
+
+
+
+        // Sicherheit
+
+        if (dixiId < 1 || dixiId > 10) {
+
+            dixiId = 1;
+
+        }
+
+
+
+        // Anzeige
 
         dixiTitle.innerText =
-        "Dixi " + dixiId;
-
-    }
-);
+            "Dixi " + dixiId;
 
 
 
+        // Testmodus Dropdown
 
+        dixiSelect.addEventListener(
+            "change",
+            function () {
 
-document
-.getElementById("submitBtn")
-.addEventListener(
-"click",
-async () => {
+                dixiId = this.value;
 
+                dixiTitle.innerText =
+                    "Dixi " + dixiId;
 
-    const hygiene =
-    document.querySelector(
-        'input[name="hygiene"]:checked'
-    );
-
-
-    const geruch =
-    document.querySelector(
-        'input[name="geruch"]:checked'
-    );
-
-
-    const ausstattung =
-    document.querySelector(
-        'input[name="ausstattung"]:checked'
-    );
-
-
-
-    if (!hygiene || !geruch || !ausstattung) {
-
-        showMessage(
-            "Bitte alle Kategorien bewerten!!!",
-            "warning"
-        );
-
-        return;
-
-    }
-
-
-
-    const { error } =
-    await client
-    .from("ratings")
-    .insert([{
-
-        dixi_id: Number(dixiId),
-
-        hygiene: Number(hygiene.value),
-
-        geruch: Number(geruch.value),
-
-        ausstattung: Number(ausstattung.value)
-
-    }]);
-
-
-
-
-    if (error) {
-
-        console.log(error);
-
-        showMessage(
-            "Fehler beim Speichern!",
-            "error"
-        );
-
-    }
-
-
-    else {
-
-
-        showMessage(
-            "Danke für deine Bewertung!!",
-            "success"
+            }
         );
 
 
-        setTimeout(
-            () => {
-
-                window.location.href =
-                "stats.html?dixi=" + dixiId;
-
-            },
-            500
-        );
-
-    }
 
 
 
-});
+        document
+            .getElementById("submitBtn")
+            .addEventListener(
+                "click",
+                async () => {
+
+
+                    const hygiene =
+                        document.querySelector(
+                            'input[name="hygiene"]:checked'
+                        );
+
+
+                    const geruch =
+                        document.querySelector(
+                            'input[name="geruch"]:checked'
+                        );
+
+
+                    const ausstattung =
+                        document.querySelector(
+                            'input[name="ausstattung"]:checked'
+                        );
+
+
+
+                    if (!hygiene || !geruch || !ausstattung) {
+
+                        showMessage(
+                            "Bitte alle Kategorien bewerten!!!",
+                            "warning"
+                        );
+
+                        return;
+
+                    }
+
+
+
+                    const { error } =
+                        await client
+                            .from("ratings")
+                            .insert([{
+
+                                dixi_id: Number(dixiId),
+
+                                hygiene: Number(hygiene.value),
+
+                                geruch: Number(geruch.value),
+
+                                ausstattung: Number(ausstattung.value)
+
+                            }]);
+
+
+
+
+                    if (error) {
+
+                        console.log(error);
+
+                        showMessage(
+                            "Fehler beim Speichern!",
+                            "error"
+                        );
+
+                    }
+
+
+                    else {
+
+
+                        showMessage(
+                            "Danke für deine Bewertung!!",
+                            "success"
+                        );
+
+
+                        setTimeout(
+                            () => {
+
+                                window.location.href =
+                                    "stats.html?dixi=" + dixiId;
+
+                            },
+                            500
+                        );
+
+                    }
+
+
+
+                });
 
 
 
 
 
-function showMessage(
-    text,
-    type
-) {
+        function showMessage(
+            text,
+            type
+        ) {
 
 
-    const box =
-    document.getElementById(
-        "messageBox"
-    );
+            const box =
+                document.getElementById(
+                    "messageBox"
+                );
 
 
-    box.innerText =
-    text;
+            box.innerText =
+                text;
 
 
-    box.className =
-    "";
+            box.className =
+                "";
 
 
-    box.classList.add(
-        type
-    );
+            box.classList.add(
+                type
+            );
 
-
-    box.style.display =
-    "block";
-
-
-
-    setTimeout(
-        () => {
 
             box.style.display =
-            "none";
-
-        },
-        2500
-    );
+                "block";
 
 
-}
+
+            setTimeout(
+                () => {
+
+                    box.style.display =
+                        "none";
+
+                },
+                2500
+            );
 
 
-</script>
+        }
+
+
+    </script>
 
 
 </body>

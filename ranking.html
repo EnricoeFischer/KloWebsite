@@ -3,223 +3,246 @@
 
 <head>
 
-<title>Dixi Ranking</title>
+    <title>Dixi Ranking</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-
-<style>
-
-body {
-    background:black;
-    color:white;
-    font-family:Arial;
-    text-align:center;
-    padding:20px;
-}
-
-
-.table-container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
+    <style>
+        body {
+            background: black;
+            color: white;
+            font-family: Arial;
+            text-align: center;
+            padding: 20px;
+        }
 
 
-table {
+        .table-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
 
-    width: 95%;
-    max-width: 900px;
 
-    border-collapse: collapse;
+        table {
+            width: 95%;
+            max-width: 900px;
 
-    background-color: #222;
+            border-collapse: collapse;
 
-    table-layout: fixed;
+            background-color: #222;
 
-}
+            table-layout: fixed;
+        }
 
 
 
-th {
+        th {
+            background-color: #cccc00;
 
-    background-color: #cccc00;
+            color: black;
 
-    color: black;
+            padding: 8px;
 
-    padding: 8px;
+            font-size: clamp(12px, 3vw, 18px);
 
-    font-size: clamp(12px, 3vw, 18px);
+            cursor: pointer;
 
-    cursor: pointer;
-
-    word-wrap: break-word;
-
-}
+            word-wrap: break-word;
+        }
 
 
 
-td {
+        td {
+            padding: 8px;
 
-    padding: 8px;
+            border: 1px solid white;
 
-    border: 1px solid white;
+            font-size: clamp(12px, 3vw, 16px);
 
-    font-size: clamp(12px, 3vw, 16px);
-
-    word-wrap: break-word;
-
-}
+            word-wrap: break-word;
+        }
 
 
+        @media (max-width: 600px) {
 
-@media (max-width: 600px) {
+            th,
+            td {
+                padding: 6px 3px;
+            }
 
+            table {
+                width: 100%;
+            }
+        }
 
-    th, td {
+        tr:nth-child(even) {
 
-        padding: 6px 3px;
+            background: #333;
+        }
 
-    }
+        button {
 
+            padding: 10px 20px;
+            margin: 10px;
 
-    table {
+            border-radius: 8px;
+            border: none;
 
-        width: 100%;
+            font-size: 16px;
 
-    }
+            cursor: pointer;
 
-}
-
-tr:nth-child(even){
-
-    background:#333;
-
-}
-
-</style>
+        }
+    </style>
 </head>
+
 <body>
-<h1>Dixi Ranking</h1>
-<divclass = "table-container">
-<table>
+    <h1>Dixi Ranking</h1>
+    <div>
 
-<thead>
+        <button onclick="setMode('today')">
+            Heute
+        </button>
 
-<tr>
+        <button onclick="setMode('all')">
+            Gesamt
+        </button>
 
-<th>Dixi</th>
+    </div>
+    <div class="table-container">
+        <table>
 
-<th onclick="sortTable('hygiene_avg')">
-Hygiene
-</th>
+            <thead>
 
-<th onclick="sortTable('ausstattung_avg')">
-Ausstattung
-</th>
+                <tr>
 
-<th onclick="sortTable('geruch_avg')">
-Geruch
-</th>
+                    <th>Dixi</th>
 
-<th onclick="sortTable('overall_avg')">
-Gesamt
-</th>
+                    <th onclick="sortTable('hygiene_avg')">
+                        Hygiene
+                    </th>
 
-</tr>
+                    <th onclick="sortTable('ausstattung_avg')">
+                        Ausstattung
+                    </th>
 
-</thead>
+                    <th onclick="sortTable('geruch_avg')">
+                        Geruch
+                    </th>
 
+                    <th onclick="sortTable('overall_avg')">
+                        Gesamt
+                    </th>
 
-<tbody id="rankingBody">
+                </tr>
 
-</tbody>
-
-
-</table>
-
-<div>
-
-<script>
-
-
-const supabaseUrl =
-"https://jagyzxwkkxkkuqvmokwq.supabase.co";
+            </thead>
 
 
-const supabaseKey ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";
+            <tbody id="rankingBody">
+
+            </tbody>
 
 
-const {createClient}=supabase;
+        </table>
+    </div>
+    <h1>Bewertungen über Zeit</h1>
+    <h3>Durchschnitt aller Bewertungen(Gesamtbewertung)</h3>
+    <div style="max-width: 900px; margin: 0 auto;">
+        <canvas id="historyChart"></canvas>
+    </div>
 
 
-const client=createClient(
-    supabaseUrl,
-    supabaseKey
-);
+    <script>
+        let rankingMode = "today";
+        let historyMode = "today";
+        let historyChart;
+
+        const supabaseUrl =
+            "https://jagyzxwkkxkkuqvmokwq.supabase.co";
 
 
-
-let ranking=[];
-
-let sortDirection=-1;
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";
 
 
-
-loadRanking();
-
+        const { createClient } = supabase;
 
 
-async function loadRanking(){
-
-
-const {data,error}=await client
-.from("rating_stats_by_dixi")
-.select("*");
-
-
-console.log(data,error);
-
-
-if(error){
-
-    console.error(error);
-    return;
-
-}
-
-
-ranking=data;
-
-
-renderTable();
-
-
-}
+        const client = createClient(
+            supabaseUrl,
+            supabaseKey
+        );
 
 
 
-function renderTable(){
+        let ranking = [];
+
+        let sortDirection = -1;
+
+        window.onload = function () {
+            loadRanking();
+            loadHistory();
+        };
 
 
-const body=document.getElementById(
-    "rankingBody"
-);
+        async function loadRanking() {
+
+            let viewName;
+            if (rankingMode === "today") {
+
+                viewName = "dixi_ranking_today";
+
+            }
+
+            else {
+
+                viewName = "dixi_ranking_all";
+            }
+
+            const { data, error } =
+                await client
+                    .from(viewName)
+                    .select("*")
+                    .order(
+                        "overall_avg",
+                        {
+                            ascending: false
+                        }
+                    );
+
+            console.log(data, error);
+            ranking = data;
+            renderTable(ranking);
+        }
+
+        function setMode(mode) {
+
+            rankingMode = mode;
+
+            historyMode = mode;
+
+            loadRanking();
+            loadHistory();
+        }
+
+        function renderTable(data) {
 
 
-body.innerHTML="";
+            const body = document.getElementById(
+                "rankingBody"
+            );
 
 
-ranking.forEach(row=>{
+            body.innerHTML = "";
 
 
-const tr=document.createElement("tr");
-
-
-tr.innerHTML=`
-
+            data.forEach(row => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
 <td>
 ${row.name}
 </td>
@@ -241,45 +264,183 @@ ${Number(row.overall_avg).toFixed(1)}
 </td>
 
 `;
+                body.appendChild(tr);
+            });
+        }
+
+        function sortTable(column) {
+
+            ranking.sort(
+                (a, b) =>
+                    (
+                        Number(b[column])
+                        -
+                        Number(a[column])
+                    )
+                    *
+                    sortDirection
+            );
 
 
-body.appendChild(tr);
+            sortDirection *= -1;
 
 
-});
+            renderTable(ranking);
 
 
-}
+        }
+
+        async function loadHistory() {
+
+            let view;
+
+            if (historyMode == "today") {
+
+                view = "rating_history_today";
+            }
+
+            else {
+
+                view = "rating_history_all";
+
+            }
+
+            const { data, error } =
+
+                await client
+                    .from(view)
+                    .select("*");
+
+            console.log(data, error);
+
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            drawHistory(data);
+
+        }
+        function drawHistory(data) {
 
 
+            const ctx =
+                document.getElementById(
+                    "historyChart"
+                );
+            if (historyChart) {
+                historyChart.destroy();
+            }
+            // alle Dixies finden
+            const dixies = [
+                ...new Set(
+                    data.map(
+                        x => x.dixi_id
+                    )
+                )
+            ];
+            const datasets = dixies.map(
+                dixi => {
+                    const values =
+                        data.filter(
+                            x =>
+                                x.dixi_id === dixi
+                        );
+                    return {
+                        label:
+                            "Dixi " + dixi,
+                        data:
+                            values.map(
+                                x =>
+                                    Number(x.average)
+                            ),
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: false
+                    };
 
+                }
+            );
 
-function sortTable(column){
+            const labels =
+                [
+                    ...new Set(
+                        data.map(
+                            x =>
+                                formatDate(x.time)
+                        )
+                    )
+                ];
 
+            historyChart =
+                new Chart(
+                    ctx,
+                    {
+                        type: "line",
+                        data: {
+                            labels: labels,
+                            datasets: datasets
+                        },
+                        options: {
+                            responsive: true,
+                            interaction: {
+                                mode: "nearest",
+                                intersect: false
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        color: "white"
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    ticks: {
+                                        color: "white"
+                                    }
+                                },
+                                y: {
+                                    min: 1,
+                                    max: 5,
+                                    ticks: {
+                                        color: "white"
+                                    }
+                                }
+                            }
+                        }
+                    });
+        }
 
-ranking.sort(
-(a,b)=>
-(
-Number(b[column])
--
-Number(a[column])
-)
-*
-sortDirection
-);
+        function formatDate(value) {
 
+            const date = new Date(value);
 
-sortDirection *= -1;
+            if (historyMode === "today") {
 
+                return date.toLocaleTimeString(
+                    "de-DE",
+                    {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    }
+                );
 
-renderTable();
+            }
+            else {
 
+                return date.toLocaleDateString(
+                    "de-DE",
+                    {
+                        day: "2-digit",
+                        month: "2-digit"
+                    }
+                );
 
-}
+            }
+        }
 
-
-
-</script>
+    </script>
 
 
 </body>
