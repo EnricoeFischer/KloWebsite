@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Dixi Ranking</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<style>
+
+body {
+    background:black;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+    padding:20px;
+}
+
+
+table {
+
+    width:95%;
+    max-width:800px;
+    margin:auto;
+    border-collapse:collapse;
+    background:#222;
+
+}
+
+
+th {
+
+    background:#cccc00;
+    color:black;
+    padding:12px;
+    cursor:pointer;
+
+}
+
+
+td {
+
+    padding:10px;
+    border:1px solid white;
+
+}
+
+
+tr:nth-child(even){
+
+    background:#333;
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<h1>Dixi Ranking</h1>
+
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Dixi</th>
+
+<th onclick="sortTable('hygiene_avg')">
+Hygiene
+</th>
+
+<th onclick="sortTable('ausstattung_avg')">
+Ausstattung
+</th>
+
+<th onclick="sortTable('geruch_avg')">
+Geruch
+</th>
+
+<th onclick="sortTable('overall_avg')">
+Gesamt
+</th>
+
+</tr>
+
+</thead>
+
+
+<tbody id="rankingBody">
+
+</tbody>
+
+
+</table>
+
+
+
+<script>
+
+
+const supabaseUrl =
+"https://jagyzxwkkxkkuqvmokwq.supabase.co";
+
+
+const supabaseKey ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";
+
+
+const {createClient}=supabase;
+
+
+const client=createClient(
+    supabaseUrl,
+    supabaseKey
+);
+
+
+
+let ranking=[];
+
+let sortDirection=-1;
+
+
+
+loadRanking();
+
+
+
+async function loadRanking(){
+
+
+const {data,error}=await client
+.from("rating_stats_by_dixi")
+.select("*");
+
+
+console.log(data,error);
+
+
+if(error){
+
+    console.error(error);
+    return;
+
+}
+
+
+ranking=data;
+
+
+renderTable();
+
+
+}
+
+
+
+function renderTable(){
+
+
+const body=document.getElementById(
+    "rankingBody"
+);
+
+
+body.innerHTML="";
+
+
+ranking.forEach(row=>{
+
+
+const tr=document.createElement("tr");
+
+
+tr.innerHTML=`
+
+<td>
+${row.name}
+</td>
+
+<td>
+${Number(row.hygiene_avg).toFixed(1)}
+</td>
+
+<td>
+${Number(row.ausstattung_avg).toFixed(1)}
+</td>
+
+<td>
+${Number(row.geruch_avg).toFixed(1)}
+</td>
+
+<td>
+${Number(row.overall_avg).toFixed(1)}
+</td>
+
+`;
+
+
+body.appendChild(tr);
+
+
+});
+
+
+}
+
+
+
+
+function sortTable(column){
+
+
+ranking.sort(
+(a,b)=>
+(
+Number(b[column])
+-
+Number(a[column])
+)
+*
+sortDirection
+);
+
+
+sortDirection *= -1;
+
+
+renderTable();
+
+
+}
+
+
+
+</script>
+
+
+</body>
+
+</html>

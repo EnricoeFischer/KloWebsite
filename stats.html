@@ -89,7 +89,7 @@
 <body>
 
     <h1>Dixi Bewertungen</h1>
-
+    <h2 id="dixiTitle"></h2>
     <!-- HYGIENE -->
     <div class="stat">
         <div class="label" onclick="toggleChart('hygieneChart')">Hygiene</div>
@@ -155,9 +155,18 @@
             <span>5</span>
         </div>
     </div>
-
+    <button id="rankingBtn">
+    Alle Dixies vergleichen
+</button>
+    <script>
+        document.getElementById("rankingBtn").addEventListener("click", () => {
+            window.location.href = "ranking.html";
+        });
+    </script>
 <script>
     // 🔴 HIER EINTRAGEN
+    const supabaseUrl = "https://jagyzxwkkxkkuqvmokwq.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";
 
 const { createClient } = supabase;
 
