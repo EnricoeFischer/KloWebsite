@@ -9,6 +9,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
 
     <style>
         body {
@@ -127,6 +129,7 @@
 
 <body>
     <h1>Dixi Ranking</h1>
+    <h2>Grün markierte Dixis wurden vor weniger als 60 min gereinigt</h2>
     <div>
 
         <button onclick="setMode('today')">
@@ -219,13 +222,13 @@
             let viewName;
             if (rankingMode === "today") {
 
-                viewName = "dixi_ranking_today";
+                viewName = "today_mean";
 
             }
 
             else {
 
-                viewName = "dixi_ranking_all";
+                viewName = "all_mean";
             }
 
             const { data, error } =
@@ -239,8 +242,58 @@
                         }
                     );
 
-            console.log(data, error);
+            if (error) {
+
+                console.error(error);
+                return;
+
+            }
+
+
+            // letzte Reinigungen laden
+            const { data: cleanings } =
+                await client
+                    .from("cleanings")
+                    .select("*");
+            console.log("Cleanings:", cleanings);
+            console.log("Ranking:", data);
             ranking = data;
+
+            ranking = ranking.map(row => {
+                const cleaning =
+                    cleanings
+                        .filter(
+                            c => c.dixi_id === row.dixi_id
+                        )
+                        .sort(
+                            (a, b) =>
+                                new Date(b.cleaned_at)
+                                -
+                                new Date(a.cleaned_at)
+                        )[0];
+
+                row.cleaned = false;
+
+                if (cleaning) {
+                    const age =
+                        Date.now()
+                        -
+                        new Date(cleaning.cleaned_at).getTime();
+                    console.log(
+                        "Reinigung:",
+                        row.dixi_id,
+                        cleaning.cleaned_at,
+                        new Date(cleaning.cleaned_at),
+                        "Alter Minuten:",
+                        age / 1000 / 60
+                    );
+                    if (age < 60 * 60 * 1000) {
+
+                        row.cleaned = true;
+                    }
+                }
+                return row;
+            });
             renderTable(ranking);
         }
 
@@ -267,6 +320,9 @@
 
             data.forEach(row => {
                 const tr = document.createElement("tr");
+                if (row.cleaned) {
+                    tr.style.backgroundColor = "green";
+                }
                 tr.innerHTML = `
 <td>
 ${row.name}
@@ -321,12 +377,12 @@ ${Number(row.overall_avg).toFixed(1)}
 
             if (historyMode == "today") {
 
-                view = "rating_history_today";
+                view = "today_hourly_mean";
             }
 
             else {
 
-                view = "rating_history_all";
+                view = "daily_mean_history";
 
             }
 
@@ -336,7 +392,15 @@ ${Number(row.overall_avg).toFixed(1)}
                     .from(view)
                     .select("*");
 
-            console.log(data, error);
+            console.log(data);
+
+            data.forEach(x => {
+                console.log(
+                    "Aus DB:", x.time,
+                    "| JS:", new Date(x.time),
+                    "| Anzeige:", formatDate(x.time)
+                );
+            });
 
             if (error) {
                 console.error(error);
@@ -348,96 +412,111 @@ ${Number(row.overall_avg).toFixed(1)}
         }
         function drawHistory(data) {
 
+            const ctx = document.getElementById("historyChart");
 
-            const ctx =
-                document.getElementById(
-                    "historyChart"
-                );
             if (historyChart) {
                 historyChart.destroy();
             }
-            // alle Dixies finden
-            const dixies = [
-                ...new Set(
-                    data.map(
-                        x => x.dixi_id
-                    )
-                )
-            ];
-            const datasets = dixies.map(
-                dixi => {
-                    const values =
-                        data.filter(
-                            x =>
-                                x.dixi_id === dixi
-                        );
-                    return {
-                        label:
-                            "Dixi " + dixi,
-                        data:
-                            values.map(
-                                x =>
-                                    Number(x.average)
-                            ),
-                        borderWidth: 2,
-                        tension: 0.3,
-                        fill: false
-                    };
 
-                }
-            );
+            // alle vorhandenen Dixies finden
+            const dixies = [...new Set(data.map(x => x.dixi_id))];
 
-            const labels =
-                [
-                    ...new Set(
-                        data.map(
-                            x =>
-                                formatDate(x.time)
-                        )
-                    )
-                ];
+            // Datensätze pro Dixi erzeugen
+            const datasets = dixies.map(dixi => {
 
-            historyChart =
-                new Chart(
-                    ctx,
-                    {
-                        type: "line",
-                        data: {
-                            labels: labels,
-                            datasets: datasets
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            interaction: {
-                                mode: "nearest",
-                                intersect: false
-                            },
-                            plugins: {
-                                legend: {
-                                    labels: {
-                                        color: "white"
-                                    }
-                                }
-                            },
-                            scales: {
-                                x: {
-                                    ticks: {
-                                        color: "white"
-                                    }
-                                },
-                                y: {
-                                    min: 1,
-                                    max: 5,
-                                    ticks: {
-                                        color: "white"
-                                    }
-                                }
+                const values = data
+                    .filter(x => x.dixi_id === dixi)
+                    .sort((a, b) => new Date(a.time) - new Date(b.time));
+
+                return {
+                    label: "Dixi " + dixi,
+
+                    data: values.map(x => ({
+                        x: x.time,
+                        y: Number(x.average)
+                    })),
+
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: false
+                };
+            });
+
+            historyChart = new Chart(ctx, {
+
+                type: "line",
+
+                data: {
+                    datasets: datasets
+                },
+
+                options: {
+
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    interaction: {
+                        mode: "nearest",
+                        intersect: false
+                    },
+
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: "white"
                             }
                         }
-                    });
-        }
+                    },
 
+                    scales: {
+
+                        x: {
+
+                            type: "time",
+
+                            time: {
+
+                                unit: historyMode === "today" ? "hour" : "day",
+
+                                displayFormats: {
+                                    hour: "HH:mm",
+                                    day: "dd.MM"
+                                }
+
+                            },
+
+                            ticks: {
+                                color: "white"
+                            },
+
+                            grid: {
+                                color: "rgba(255,255,255,0.1)"
+                            }
+
+                        },
+
+                        y: {
+
+                            min: 1,
+                            max: 5,
+
+                            ticks: {
+                                color: "white"
+                            },
+
+                            grid: {
+                                color: "rgba(255,255,255,0.1)"
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            });
+
+        }
         function formatDate(value) {
 
             const date = new Date(value);

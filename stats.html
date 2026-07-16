@@ -222,9 +222,9 @@
 
 
             const { data, error } = await client
-                .from("rating_stats_by_dixi")
+                .from("today_mean")
                 .select("*")
-                .eq("id", dixiId)
+                .eq("dixi_id", dixiId)
                 .single();
 
 
@@ -245,10 +245,17 @@
 
 
 
-            document.getElementById(
-                "dixiTitle"
-            ).innerText =
-                data.name + " Bewertungen";
+            const wochentag = new Date().toLocaleDateString("de-DE", {
+                weekday: "long"
+            });
+
+            const tag =
+                wochentag.charAt(0).toUpperCase() +
+                wochentag.slice(1);
+
+            document.getElementById("dixiTitle").innerText =
+                `Dixi ${dixiId} Bewertung ${tag}`;
+
 
 
 
@@ -284,7 +291,7 @@
 
 
             const { data, error } = await client
-                .from("rating_histogram_by_dixi")
+                .from("today_histogram")
                 .select("*")
                 .eq(
                     "dixi_id",
@@ -359,6 +366,13 @@
                         a.rating - b.rating
                 );
 
+
+            console.log(
+                "Chart:",
+                category,
+                filtered
+            );
+
             new Chart(
                 document.getElementById(canvasId),
                 {
@@ -373,7 +387,7 @@
                                 "Anzahl Bewertungen",
                             data:
                                 filtered.map(
-                                    x => x.amount
+                                    x => x.count
                                 ),
                             backgroundColor:
                                 "rgba(0,200,255,0.6)",

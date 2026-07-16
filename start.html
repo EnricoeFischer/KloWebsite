@@ -64,10 +64,15 @@
 
         #infoBtn {
 
-            background: #cccc00;
+            background: #00cc66;
 
             color: black;
 
+        }
+
+        #cleanBtn {
+            background: #00cc66;
+            color: black;
         }
     </style>
 
@@ -93,7 +98,9 @@
         Dixi Ranking ansehen
     </button>
 
-
+    <button id="cleanBtn">
+        Dixi Reinigung melden
+    </button>
 
     <script>
 
@@ -150,6 +157,16 @@
 
                 });
 
+        document
+            .getElementById("cleanBtn")
+            .addEventListener(
+                "click",
+                function () {
+
+                    window.location.href =
+                        "clean.html";
+
+                });
 
     </script>
 

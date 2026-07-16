@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Dixi Reinigung melden</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+    <style>
+        body {
+
+            background: black;
+            color: white;
+            font-family: Arial;
+            text-align: center;
+            padding: 40px;
+
+        }
+
+
+        input {
+
+            font-size: 22px;
+            width: 100px;
+            text-align: center;
+            padding: 10px;
+
+        }
+
+
+        button {
+
+            margin-top: 30px;
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            background: #00cc66;
+
+        }
+    </style>
+
+
+</head>
+
+
+<body>
+
+
+    <h1>Dixi Reinigung melden</h1>
+
+
+    <h2>
+        Welches Dixi wurde gereinigt?
+    </h2>
+
+
+    <input id="dixiInput" type="number" min="1" placeholder="Nr.">
+
+
+    <br>
+
+
+    <button onclick="sendCleaning()">
+        Melden
+    </button>
+
+
+
+    <script>
+
+
+        const supabaseUrl =
+            "https://jagyzxwkkxkkuqvmokwq.supabase.co";
+
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";
+
+
+
+        const { createClient } = supabase;
+
+
+        const client = createClient(
+            supabaseUrl,
+            supabaseKey
+        );
+
+
+
+        async function sendCleaning() {
+
+
+            const dixiId =
+                Number(
+                    document.getElementById("dixiInput").value
+                );
+
+
+
+            if (!dixiId) {
+
+                alert("Bitte Dixi Nummer eingeben");
+
+                return;
+
+            }
+
+
+
+            const { error } = await client
+                .from("cleanings")
+                .insert({
+
+                    dixi_id: dixiId
+
+                });
+
+
+
+            if (error) {
+
+                console.error(error);
+
+                alert("Fehler beim Speichern");
+
+            }
+
+            else {
+
+                window.location.href = "start.html";
+
+            }
+
+
+        }
+
+
+
+    </script>
+
+
+</body>
+
+</html>
