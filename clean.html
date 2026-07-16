@@ -90,19 +90,27 @@
             supabaseKey
         );
 
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        const returnDixiId =
+            params.get("dixi");
 
 
         async function sendCleaning() {
 
 
-            const dixiId =
+            const cleandixiId =
                 Number(
                     document.getElementById("dixiInput").value
                 );
 
 
 
-            if (!dixiId) {
+            if (!cleandixiId) {
 
                 alert("Bitte Dixi Nummer eingeben");
 
@@ -116,7 +124,7 @@
                 .from("cleanings")
                 .insert({
 
-                    dixi_id: dixiId
+                    dixi_id: cleandixiId
 
                 });
 
@@ -132,7 +140,7 @@
 
             else {
 
-                window.location.href = "start.html";
+                window.location.href = "start.html?dixi=" + returnDixiId;
 
             }
 
