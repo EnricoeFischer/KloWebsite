@@ -178,8 +178,8 @@
 
         </table>
     </div>
-    <h1>Bewertungen über Zeit</h1>
-    <h3>Durchschnitt aller Bewertungen(Gesamtbewertung)</h3>
+    <h1 id="historyTitle"></h1>
+    <h3>Plot über die Gesamtbewertung jedes Dixis</h3>
     <div class="chart-container">
         <canvas id="historyChart"></canvas>
     </div>
@@ -212,8 +212,7 @@
         let sortDirection = -1;
 
         window.onload = function () {
-            loadRanking();
-            loadHistory();
+            setMode("today")
         };
 
 
@@ -302,7 +301,18 @@
             rankingMode = mode;
 
             historyMode = mode;
+            const historyTitle =
+                document.getElementById("historyTitle");
 
+            if (historyMode === "today") {
+                historyTitle.innerText =
+                    "Bewertung des Tages";
+            }
+
+            else {
+                historyTitle.innerText =
+                    "Bewertung der gesamten Zeit";
+            }
             loadRanking();
             loadHistory();
         }

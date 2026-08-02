@@ -83,6 +83,18 @@
             background-color: #ffcc00;
             color: black;
         }
+
+        .rating-hint {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto -5px auto;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 8px;
+            box-sizing: border-box;
+            color: #cccccc;
+            font-size: 14px;
+        }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -127,6 +139,11 @@
 
 
     <h2>Hygiene</h2>
+
+    <div class="rating-hint">
+        <span>Schlecht</span>
+        <span>Gut</span>
+    </div>
 
     <div class="rating">
 
@@ -173,7 +190,6 @@
 
 
     <h2>Ausstattung</h2>
-
     <div class="rating">
 
         <input type="radio" id="a1" name="ausstattung" value="1">
