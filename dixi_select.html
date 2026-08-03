@@ -3,7 +3,7 @@
 
 <head>
 
-    <title>Dixi Reinigung melden</title>
+    <title>Welches Dixi möchtest du bewerten?</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -51,12 +51,8 @@
 <body>
 
 
-    <h1>Dixi Reinigung melden</h1>
+    <h1>Dixi Nummer wählen</h1>
 
-
-    <h2>
-        Welches Dixi wurde gereinigt?
-    </h2>
 
 
     <input id="dixiInput" type="number" min="1" placeholder="Nr.">
@@ -65,8 +61,8 @@
     <br>
 
 
-    <button onclick="sendCleaning()">
-        Melden
+    <button onclick="Idselection()">
+        Bewerten
     </button>
 
 
@@ -80,7 +76,6 @@
 
         const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVveW56Y3ZibGJlbHh5dHpwend4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNTkyNTAsImV4cCI6MjA5NzYzNTI1MH0.XADi4nRE1FH4O-Nwkhfb4a6_HnAcmRPjk9x8SnO_TpY";;
 
-
         const { createClient } = supabase;
 
 
@@ -89,27 +84,18 @@
             supabaseKey
         );
 
-        const params =
-            new URLSearchParams(
-                window.location.search
-            );
 
 
-        const returnDixiId =
-            params.get("dixi");
+        async function Idselection() {
 
 
-        async function sendCleaning() {
-
-
-            const cleandixiId =
+            const dixiId =
                 Number(
                     document.getElementById("dixiInput").value
                 );
 
 
-
-            if (!cleandixiId) {
+            if (!dixiId) {
 
                 alert("Bitte Dixi Nummer eingeben");
 
@@ -118,30 +104,28 @@
             }
 
 
-
-            const { error } = await client
-                .from("cleanings")
-                .insert({
-
-                    dixi_id: cleandixiId
-
-                });
+            const { data: dixi, error } = await client
+                .from("dixies")
+                .select("*")
+                .eq("id", dixiId)
+                .eq("active", true)
+                .single();
 
 
 
-            if (error) {
+            if (error || !dixi) {
 
-                console.error(error);
+                alert(
+                    "Dieses Dixi existiert nicht."
+                );
 
-                alert("Fehler beim Speichern, möglicher Weise existiert dein Dixie nicht");
-
-            }
-
-            else {
-
-                window.location.href = "start.html?dixi=" + returnDixiId;
+                return;
 
             }
+
+
+            window.location.href =
+                "index.html?dixi=" + dixiId;
 
 
         }

@@ -83,6 +83,18 @@
             background-color: #ffcc00;
             color: black;
         }
+
+        .rating-hint {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto -5px auto;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 8px;
+            box-sizing: border-box;
+            color: #cccccc;
+            font-size: 14px;
+        }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -127,7 +139,10 @@
 
 
     <h2>Hygiene</h2>
-
+    <div class="rating-hint">
+        <span>Schlecht</span>
+        <span>Gut</span>
+    </div>
     <div class="rating">
 
         <input type="radio" id="h1" name="hygiene" value="1">
@@ -208,10 +223,10 @@
 
 
         const supabaseUrl =
-            "https://jagyzxwkkxkkuqvmokwq.supabase.co";
+            "https://eoynzcvblbelxytzpzwx.supabase.co";
 
 
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";;
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVveW56Y3ZibGJlbHh5dHpwend4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNTkyNTAsImV4cCI6MjA5NzYzNTI1MH0.XADi4nRE1FH4O-Nwkhfb4a6_HnAcmRPjk9x8SnO_TpY";;
 
 
         const { createClient } = supabase;
@@ -278,7 +293,7 @@
 
         // Sicherheit
 
-        if (dixiId < 1 || dixiId > 10) {
+        if (dixiId < 1 || dixiId > 20) {
 
             dixiId = 1;
 

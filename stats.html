@@ -103,6 +103,9 @@
 <body>
 
     <h1>Dixi Bewertungen</h1>
+    <a href="https://www.instagram.com/rateyourdixi?igsh=ODNnaXdqeXpsYXBx" target="_blank">
+        Rate your Open Flair Dixi Instagramm
+    </a>
     <h2 id="dixiTitle"></h2>
     <!-- HYGIENE -->
     <div class="stat">
@@ -179,8 +182,8 @@
     </script>
     <script>
         // 🔴 HIER EINTRAGEN
-        const supabaseUrl = "https://jagyzxwkkxkkuqvmokwq.supabase.co";
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";
+        const supabaseUrl = "https://eoynzcvblbelxytzpzwx.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVveW56Y3ZibGJlbHh5dHpwend4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNTkyNTAsImV4cCI6MjA5NzYzNTI1MH0.XADi4nRE1FH4O-Nwkhfb4a6_HnAcmRPjk9x8SnO_TpY";;
 
         const { createClient } = supabase;
 
@@ -487,8 +490,11 @@
         ) {
 
 
-            const safeValue =
-                value ?? 3;
+            const safeValue = value ?? 0;
+            document
+                .getElementById(valueId)
+                .innerText =
+                value ? value.toFixed(1) : "-";
 
 
 
