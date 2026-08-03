@@ -195,10 +195,8 @@
 
         const supabaseUrl =
             "https://eoynzcvblbelxytzpzwx.supabase.co";
-            "https://eoynzcvblbelxytzpzwx.supabase.co";
 
 
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVveW56Y3ZibGJlbHh5dHpwend4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNTkyNTAsImV4cCI6MjA5NzYzNTI1MH0.XADi4nRE1FH4O-Nwkhfb4a6_HnAcmRPjk9x8SnO_TpY";;
         const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVveW56Y3ZibGJlbHh5dHpwend4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNTkyNTAsImV4cCI6MjA5NzYzNTI1MH0.XADi4nRE1FH4O-Nwkhfb4a6_HnAcmRPjk9x8SnO_TpY";;
 
 
@@ -217,8 +215,6 @@
         let sortDirection = -1;
 
         window.onload = function () {
-            setMode("today");
-
             setMode("today");
 
         };
@@ -255,10 +251,7 @@
                 return;
 
             }
-
-
             // letzte Reinigungen laden
-            const { data: cleanings, error: cleaningError } =
             const { data: cleanings, error: cleaningError } =
                 await client
                     .from("cleanings")
@@ -273,15 +266,10 @@
                 row => row.rating_count > 0
             );
 
-            // Nur Dixies anzeigen, die mindestens eine Bewertung haben
-            ranking = data.filter(
-                row => row.rating_count > 0
-            );
 
             ranking = ranking.map(row => {
 
                 const cleaning =
-                    (cleanings ?? [])
                     (cleanings ?? [])
                         .filter(
                             c => c.dixi_id === row.dixi_id
@@ -322,8 +310,6 @@
             rankingMode = mode;
 
             historyMode = mode;
-            const historyTitle =
-                document.getElementById("historyTitle");
 
             const historyTitle =
                 document.getElementById("historyTitle");
