@@ -194,10 +194,10 @@
         let historyChart;
 
         const supabaseUrl =
-            "https://jagyzxwkkxkkuqvmokwq.supabase.co";
+            "https://eoynzcvblbelxytzpzwx.supabase.co";
 
 
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZ3l6eHdra3hra3Vxdm1va3dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE4MjIsImV4cCI6MjA5NzYzNzgyMn0.A1ImPgv9Cif4tTu8IxhNpdn3xN7lQW1fbh0_gPAN9lY";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVveW56Y3ZibGJlbHh5dHpwend4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNTkyNTAsImV4cCI6MjA5NzYzNTI1MH0.XADi4nRE1FH4O-Nwkhfb4a6_HnAcmRPjk9x8SnO_TpY";;
 
 
         const { createClient } = supabase;
@@ -215,7 +215,11 @@
         let sortDirection = -1;
 
         window.onload = function () {
+<<<<<<< HEAD
+            setMode("today");
+=======
             setMode("today")
+>>>>>>> f29aabc8dec6cc8f4da7a6cdd2247cf1b638975d
         };
 
 
@@ -253,17 +257,23 @@
 
 
             // letzte Reinigungen laden
-            const { data: cleanings } =
+            const { data: cleanings, error: cleaningError } =
                 await client
                     .from("cleanings")
                     .select("*");
+
             console.log("Cleanings:", cleanings);
             console.log("Ranking:", data);
-            ranking = data;
+
+            // Nur Dixies anzeigen, die mindestens eine Bewertung haben
+            ranking = data.filter(
+                row => row.rating_count > 0
+            );
 
             ranking = ranking.map(row => {
+
                 const cleaning =
-                    cleanings
+                    (cleanings ?? [])
                         .filter(
                             c => c.dixi_id === row.dixi_id
                         )
@@ -277,25 +287,20 @@
                 row.cleaned = false;
 
                 if (cleaning) {
+
                     const age =
                         Date.now()
                         -
                         new Date(cleaning.cleaned_at).getTime();
-                    console.log(
-                        "Reinigung:",
-                        row.dixi_id,
-                        cleaning.cleaned_at,
-                        new Date(cleaning.cleaned_at),
-                        "Alter Minuten:",
-                        age / 1000 / 60
-                    );
-                    if (age < 60 * 60 * 1000) {
 
+                    if (age < 60 * 60 * 1000) {
                         row.cleaned = true;
                     }
                 }
+
                 return row;
             });
+
             renderTable(ranking);
         }
 
@@ -307,6 +312,23 @@
             const historyTitle =
                 document.getElementById("historyTitle");
 
+<<<<<<< HEAD
+            const historyTitle =
+                document.getElementById("historyTitle");
+
+            if (historyMode === "today") {
+
+                historyTitle.innerText =
+                    "Bewertung des Tages";
+
+            } else {
+
+                historyTitle.innerText =
+                    "Bewertung der gesamten Zeit";
+
+            }
+
+=======
             if (historyMode === "today") {
                 historyTitle.innerText =
                     "Bewertung des Tages";
@@ -316,6 +338,7 @@
                 historyTitle.innerText =
                     "Bewertung der gesamten Zeit";
             }
+>>>>>>> f29aabc8dec6cc8f4da7a6cdd2247cf1b638975d
             loadRanking();
             loadHistory();
         }
